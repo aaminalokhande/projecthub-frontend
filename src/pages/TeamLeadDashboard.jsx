@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { createTask, getProjects, getTasks } from "../services/api";
+import {
+  createTask,
+  getProjects,
+  getTasks,
+  updateTask,
+  deleteTask,
+} from "../services/api";
 
 function TeamLeadDashboard() {
   const { user, token, logout } = useAuth();
@@ -20,6 +26,18 @@ function TeamLeadDashboard() {
 
   const [taskMessage, setTaskMessage] = useState("");
   const [taskError, setTaskError] = useState("");
+
+  const [editingTaskId, setEditingTaskId] = useState(null);
+
+const emptyTaskForm = {
+  title: "",
+  description: "",
+  status: "pending",
+  priority: "medium",
+  due_date: "",
+  project_id: "",
+  assigned_to: "",
+};
 
   const fetchProjects = async () => {
     try {
@@ -65,24 +83,50 @@ function TeamLeadDashboard() {
         assigned_to: taskForm.assigned_to ? Number(taskForm.assigned_to) : null,
       };
 
-      await createTask(payload, token);
+      if (editingTaskId) {
+    await updateTask(editingTaskId, payload, token);
+    setTaskMessage("Task updated successfully!");
+} else {
+    await createTask(payload, token);
+    setTaskMessage("Task created successfully!");
+}
 
       setTaskMessage("Task created successfully!");
-      setTaskForm({
-        title: "",
-        description: "",
-        status: "pending",
-        priority: "medium",
-        due_date: "",
-        project_id: "",
-        assigned_to: "",
-      });
+      setTaskForm(emptyTaskForm);
+setEditingTaskId(null);
 
       fetchTasks();
     } catch (err) {
       setTaskError(err.message || "Failed to create task");
     }
   };
+
+
+const handleEditTask = (task) => {
+  setEditingTaskId(task.id);
+
+  setTaskForm({
+    title: task.title,
+    description: task.description || "",
+    status: task.status,
+    priority: task.priority,
+    due_date: task.due_date || "",
+    project_id: task.project_id,
+    assigned_to: task.assigned_to || "",
+  });
+};
+
+const handleDeleteTask = async (taskId) => {
+  if (!window.confirm("Delete this task?")) return;
+
+  try {
+    await deleteTask(taskId, token);
+    fetchTasks();
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
 
   return (
     <div className="dashboard-page">
@@ -165,7 +209,20 @@ function TeamLeadDashboard() {
               onChange={handleTaskChange}
             />
 
-            <button type="submit">Create Task</button>
+            <button type="submit">
+  {editingTaskId ? "Update Task" : "Create Task"}
+</button>
+{editingTaskId && (
+  <button
+    type="button"
+    onClick={() => {
+      setEditingTaskId(null);
+      setTaskForm(emptyTaskForm);
+    }}
+  >
+    Cancel
+  </button>
+)}
           </form>
 
           {taskMessage && <p className="success-text">{taskMessage}</p>}
@@ -207,6 +264,21 @@ function TeamLeadDashboard() {
                   <p><strong>Due:</strong> {task.due_date}</p>
                   <p><strong>Project ID:</strong> {task.project_id}</p>
                   <p><strong>Assigned To:</strong> {task.assigned_to ?? "Not assigned"}</p>
+                  <div className="action-buttons">
+  <button
+    className="edit-btn"
+    onClick={() => handleEditTask(task)}
+  >
+    Edit Task
+  </button>
+
+  <button
+    className="delete-btn"
+    onClick={() => handleDeleteTask(task.id)}
+  >
+    Delete Task
+  </button>
+</div>
                 </div>
               ))}
             </div>

@@ -177,3 +177,40 @@ export async function updateTaskStatus(taskId, status) {
 
   return await response.json();
 }
+
+
+export async function updateTask(taskId, taskData, token) {
+  const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(taskData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to update task");
+  }
+
+  return data;
+}
+
+export async function deleteTask(taskId, token) {
+  const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.detail || "Failed to delete task");
+  }
+
+  return data;
+}
