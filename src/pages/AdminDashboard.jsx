@@ -29,6 +29,9 @@ function AdminDashboard() {
   const [projectError, setProjectError] = useState("");
   const [editingProject, setEditingProject] = useState(null);
   const [editingTaskId, setEditingTaskId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("none");
 
   // ---------------- TASK STATE ----------------
   const [taskForm, setTaskForm] = useState({
@@ -214,10 +217,74 @@ const handleDeleteTask = async (taskId) => {
   }
 };
 
+const filteredTasks = tasks.filter((task) => {
+  const matchesSearch = task.title
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
+
+  const matchesStatus =
+    statusFilter === "all" || task.status === statusFilter;
+
+  return matchesSearch && matchesStatus;
+});
+
+const sortedTasks = [...filteredTasks].sort((a, b) => {
+  switch (sortBy) {
+    case "title":
+      return a.title.localeCompare(b.title);
+
+    case "priority": {
+      const priorityOrder = {
+        high: 1,
+        medium: 2,
+        low: 3,
+      };
+
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    }
+
+    case "status":
+      return a.status.localeCompare(b.status);
+
+    case "due_date":
+      return new Date(a.due_date) - new Date(b.due_date);
+
+    default:
+      return 0;
+  }
+});
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-card">
         <div className="dashboard-header">
+          <div className="dashboard-section">
+  <h2>Dashboard Overview</h2>
+
+  <div className="stats-grid">
+
+    <div className="stat-card">
+      <h3>Total Projects</h3>
+      <p>{projects.length}</p>
+    </div>
+
+    <div className="stat-card">
+      <h3>Total Tasks</h3>
+      <p>{tasks.length}</p>
+    </div>
+
+    <div className="stat-card">
+      <h3>Completed Tasks</h3>
+      <p>{tasks.filter(task => task.status === "completed").length}</p>
+    </div>
+
+    <div className="stat-card">
+      <h3>Pending Tasks</h3>
+      <p>{tasks.filter(task => task.status === "pending").length}</p>
+    </div>
+
+  </div>
+</div>
           <div>
             <h1>Admin Dashboard</h1>
             <p>Welcome, {user?.name}</p>
@@ -457,14 +524,50 @@ const handleDeleteTask = async (taskId) => {
           )}
         </div>
 
+        <div className="dashboard-section">
+  <h2>Search & Filter Tasks</h2>
+
+  <input
+    type="text"
+    placeholder="Search by task title..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
+
+  <select
+    value={statusFilter}
+    onChange={(e) => setStatusFilter(e.target.value)}
+  >
+    <option value="all">All</option>
+    <option value="pending">Pending</option>
+    <option value="in_progress">In Progress</option>
+    <option value="completed">Completed</option>
+  </select>
+</div>
+
+<div className="dashboard-section">
+  <h2>Sort Tasks</h2>
+
+  <select
+    value={sortBy}
+    onChange={(e) => setSortBy(e.target.value)}
+  >
+    <option value="none">No Sorting</option>
+    <option value="title">Title (A-Z)</option>
+    <option value="priority">Priority</option>
+    <option value="status">Status</option>
+    <option value="due_date">Due Date</option>
+  </select>
+</div>
+
         {/* TASK LIST */}
         <div className="dashboard-section">
           <h2>All Tasks</h2>
-          {tasks.length === 0 ? (
+          {sortedTasks.length === 0 ? (
             <p>No tasks found.</p>
           ) : (
             <div className="task-list">
-              {tasks.map((task) => (
+              {sortedTasks.map((task) => (
                 <div key={task.id} className="task-card">
                   <h3>{task.title}</h3>
                   <p>{task.description}</p>
