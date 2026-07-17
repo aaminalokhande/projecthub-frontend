@@ -94,6 +94,33 @@ const emptyTaskForm = {
     e.preventDefault();
     setTaskMessage("");
     setTaskError("");
+    if (!taskForm.title.trim()) {
+  setTaskError("Task title is required.");
+  return;
+}
+
+if (!taskForm.description.trim()) {
+  setTaskError("Task description is required.");
+  return;
+}
+
+if (!taskForm.project_id) {
+  setTaskError("Project ID is required.");
+  return;
+}
+
+if (!taskForm.due_date) {
+  setTaskError("Due date is required.");
+  return;
+}
+
+if (
+  taskForm.assigned_to &&
+  Number(taskForm.assigned_to) <= 0
+) {
+  setTaskError("Invalid Employee ID.");
+  return;
+}
     setSubmittinf(true);
 
     try {
@@ -105,10 +132,10 @@ const emptyTaskForm = {
 
       if (editingTaskId) {
     await updateTask(editingTaskId, payload, token);
-    setTaskMessage("Task updated successfully!");
+    setTaskMessage("✅ Task updated successfully!");
 } else {
     await createTask(payload, token);
-    setTaskMessage("Task created successfully!");
+    setTaskMessage("✅ Task created successfully!");
 }
 
       setTaskForm(emptyTaskForm);
@@ -142,6 +169,7 @@ const handleDeleteTask = async (taskId) => {
 
   try {
     await deleteTask(taskId, token);
+    setTaskMessage("🗑️ Task deleted successfully.");
     fetchTasks();
   } catch (err) {
     alert(err.message);
@@ -195,6 +223,12 @@ const paginatedTasks = sortedTasks.slice(
   taskPage * ITEMS_PER_PAGE
 );
 
+const handleLogout = () => {
+  if (window.confirm("Are you sure you want to logout?")) {
+    logout();
+  }
+};
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-card">
@@ -232,9 +266,12 @@ const paginatedTasks = sortedTasks.slice(
             <p>Email: {user?.email}</p>
             <p>Role: {user?.role}</p>
           </div>
-          <button onClick={logout} className="logout-btn">
-            Logout
-          </button>
+          <button
+  onClick={handleLogout}
+  className="logout-btn"
+>
+  Logout
+</button>
         </div>
 
         {/* CREATE TASK */}

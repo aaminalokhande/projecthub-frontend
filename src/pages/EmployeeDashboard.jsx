@@ -36,7 +36,7 @@ const [taskPage, setTaskPage] = useState(1);
   selectedStatus[taskId] || tasks.find(t => t.id === taskId)?.status
 );
 
-alert("Task status updated successfully!");
+alert("✅ Task status updated successfully!");
 fetchTasks(); // Reload tasks after update
   } catch (err) {
     alert(err.message);
@@ -91,6 +91,12 @@ const paginatedTasks = sortedTasks.slice(
   taskPage * ITEMS_PER_PAGE
 );
 
+const handleLogout = () => {
+  if (window.confirm("Are you sure you want to logout?")) {
+    logout();
+  }
+};
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-card">
@@ -128,9 +134,12 @@ const paginatedTasks = sortedTasks.slice(
             <p>Email: {user?.email}</p>
             <p>Role: {user?.role}</p>
           </div>
-          <button onClick={logout} className="logout-btn">
-            Logout
-          </button>
+          <button
+  onClick={handleLogout}
+  className="logout-btn"
+>
+  Logout
+</button>
         </div>
 
         <div className="dashboard-section">

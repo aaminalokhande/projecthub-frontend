@@ -104,6 +104,39 @@ const [taskPage, setTaskPage] = useState(1);
   setProjectMessage("");
   setProjectError("");
 
+  if (!projectForm.title.trim()) {
+    setProjectError("Project title is required.");
+    return;
+  }
+
+  if (!projectForm.description.trim()) {
+    setProjectError("Project description is required.");
+    return;
+  }
+
+  if (!projectForm.start_date) {
+    setProjectError("Start date is required.");
+    return;
+  }
+
+  if (!projectForm.due_date) {
+    setProjectError("Due date is required.");
+    return;
+  }
+
+  if (projectForm.due_date < projectForm.start_date) {
+    setProjectError("Due date cannot be before start date.");
+    return;
+  }
+
+  if (
+    projectForm.team_lead_id &&
+    Number(projectForm.team_lead_id) <= 0
+  ) {
+    setProjectError("Invalid Team Lead ID.");
+    return;
+  }
+
   try {
     const payload = {
       ...projectForm,
@@ -114,10 +147,10 @@ const [taskPage, setTaskPage] = useState(1);
 
     if (editingProject) {
       await updateProject(editingProject.id, payload, token);
-      setProjectMessage("Project updated successfully!");
+      setProjectMessage("✅ Project updated successfully.");
     } else {
       await createProject(payload, token);
-      setProjectMessage("Project created successfully!");
+      setProjectMessage("✅ Project created successfully.");
     }
 
     setProjectForm({
@@ -283,6 +316,12 @@ const paginatedTasks = sortedTasks.slice(
   taskPage * ITEMS_PER_PAGE
 );
 
+const handleLogout = () => {
+  if (window.confirm("Are you sure you want to logout?")) {
+    logout();
+  }
+};
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-card">
@@ -320,9 +359,12 @@ const paginatedTasks = sortedTasks.slice(
             <p>Email: {user?.email}</p>
             <p>Role: {user?.role}</p>
           </div>
-          <button onClick={logout} className="logout-btn">
-            Logout
-          </button>
+          <button
+  onClick={handleLogout}
+  className="logout-btn"
+>
+  Logout
+</button>
         </div>
 
         {/* CREATE PROJECT */}
