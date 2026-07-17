@@ -10,19 +10,24 @@ function EmployeeDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
 const [statusFilter, setStatusFilter] = useState("all");
 const [sortBy, setSortBy] = useState("none");
+const [loadingTasks, setLoadingTasks] = useState(true);
 
 const ITEMS_PER_PAGE = 5;
 
 const [taskPage, setTaskPage] = useState(1);
 
   const fetchTasks = async () => {
-    try {
-      const data = await getTasks(token);
-      setTasks(data);
-    } catch (err) {
-      console.error("Failed to load tasks:", err.message);
-    }
-  };
+  try {
+    setLoadingTasks(true);
+
+    const data = await getTasks(token);
+    setTasks(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingTasks(false);
+  }
+};
 
   const handleStatusUpdate = async (taskId) => {
   try {
@@ -165,11 +170,11 @@ const paginatedTasks = sortedTasks.slice(
 </div>
 
         <div className="dashboard-section">
-          <h2>My Assigned Tasks</h2>
-
-          {paginatedTasks.length === 0 ? (
-            <p>No tasks assigned yet.</p>
-          ) : (
+          {loadingTasks ? (
+  <p>Loading tasks...</p>
+) : paginatedTasks.length === 0 ? (
+  <p>No tasks assigned.</p>
+) : (
             <div className="task-list">
               {paginatedTasks.map((task) => (
                 <div key={task.id} className="task-card">

@@ -21,6 +21,9 @@ const ITEMS_PER_PAGE = 5;
 
 const [projectPage, setProjectPage] = useState(1);
 const [taskPage, setTaskPage] = useState(1);
+const [loadingProjects, setLoadingProjects] = useState(true);
+const [loadingTasks, setLoadingTasks] = useState(true);
+const [submitting, setSubmitting] = useState(false);
 
   const [taskForm, setTaskForm] = useState({
     title: "",
@@ -48,22 +51,30 @@ const emptyTaskForm = {
 };
 
   const fetchProjects = async () => {
-    try {
-      const data = await getProjects(token);
-      setProjects(data);
-    } catch (err) {
-      console.error("Failed to load projects:", err.message);
-    }
-  };
+  try {
+    setLoadingProjects(true);
+
+    const data = await getProjects(token);
+    setProjects(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingProjects(false);
+  }
+};
 
   const fetchTasks = async () => {
-    try {
-      const data = await getTasks(token);
-      setTasks(data);
-    } catch (err) {
-      console.error("Failed to load tasks:", err.message);
-    }
-  };
+  try {
+    setLoadingTasks(true);
+
+    const data = await getTasks(token);
+    setTasks(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoadingTasks(false);
+  }
+};
 
   useEffect(() => {
     if (token) {
@@ -83,6 +94,7 @@ const emptyTaskForm = {
     e.preventDefault();
     setTaskMessage("");
     setTaskError("");
+    setSubmittinf(true);
 
     try {
       const payload = {
@@ -105,6 +117,8 @@ setEditingTaskId(null);
       fetchTasks();
     } catch (err) {
       setTaskError(err.message || "Failed to create task");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -289,8 +303,15 @@ const paginatedTasks = sortedTasks.slice(
               onChange={handleTaskChange}
             />
 
-            <button type="submit">
-  {editingTaskId ? "Update Task" : "Create Task"}
+            <button
+  type="submit"
+  disabled={submitting}
+>
+  {submitting
+    ? "Saving..."
+    : editingTaskId
+      ? "Update Task"
+      : "Create Task"}
 </button>
 {editingTaskId && (
   <button
@@ -311,10 +332,11 @@ const paginatedTasks = sortedTasks.slice(
 
         {/* PROJECTS */}
         <div className="dashboard-section">
-          <h2>My Assigned Projects</h2>
-          {projects.length === 0 ? (
-            <p>No projects assigned.</p>
-          ) : (
+          {loadingProjects ? (
+  <p>Loading projects...</p>
+) : paginatedProjects.length === 0 ? (
+  <p>No projects assigned.</p>
+) : (
             <div className="project-list">
               {paginatedProjects.map((project) => (
                 <div key={project.id} className="project-card">
@@ -389,10 +411,11 @@ const paginatedTasks = sortedTasks.slice(
 
         {/* TASKS */}
         <div className="dashboard-section">
-          <h2>Tasks For My Projects</h2>
-          {paginatedTasks.length === 0 ? (
-            <p>No tasks found for your projects.</p>
-          ) : (
+          {loadingTasks ? (
+  <p>Loading tasks...</p>
+) : paginatedTasks.length === 0 ? (
+  <p>No tasks found.</p>
+) : (
             <div className="task-list">
               {paginatedTasks.map((task) => (
                 <div key={task.id} className="task-card">
