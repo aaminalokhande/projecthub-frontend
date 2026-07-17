@@ -11,6 +11,10 @@ function EmployeeDashboard() {
 const [statusFilter, setStatusFilter] = useState("all");
 const [sortBy, setSortBy] = useState("none");
 
+const ITEMS_PER_PAGE = 5;
+
+const [taskPage, setTaskPage] = useState(1);
+
   const fetchTasks = async () => {
     try {
       const data = await getTasks(token);
@@ -76,6 +80,11 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
       return 0;
   }
 });
+
+const paginatedTasks = sortedTasks.slice(
+  (taskPage - 1) * ITEMS_PER_PAGE,
+  taskPage * ITEMS_PER_PAGE
+);
 
   return (
     <div className="dashboard-page">
@@ -158,11 +167,11 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
         <div className="dashboard-section">
           <h2>My Assigned Tasks</h2>
 
-          {sortedTasks.length === 0 ? (
+          {paginatedTasks.length === 0 ? (
             <p>No tasks assigned yet.</p>
           ) : (
             <div className="task-list">
-              {sortedTasks.map((task) => (
+              {paginatedTasks.map((task) => (
                 <div key={task.id} className="task-card">
   <h3>{task.title}</h3>
 
@@ -198,6 +207,31 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
             </div>
           )}
         </div>
+
+<div className="pagination">
+  <button
+    onClick={() => setTaskPage(taskPage - 1)}
+    disabled={taskPage === 1}
+  >
+    Previous
+  </button>
+
+  <span>
+    Page {taskPage} of{" "}
+    {Math.ceil(sortedTasks.length / ITEMS_PER_PAGE)}
+  </span>
+
+  <button
+    onClick={() => setTaskPage(taskPage + 1)}
+    disabled={
+      taskPage ===
+      Math.ceil(sortedTasks.length / ITEMS_PER_PAGE)
+    }
+  >
+    Next
+  </button>
+</div>
+
       </div>
     </div>
   );

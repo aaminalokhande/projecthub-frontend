@@ -33,6 +33,11 @@ function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("none");
 
+  const ITEMS_PER_PAGE = 5;
+
+const [projectPage, setProjectPage] = useState(1);
+const [taskPage, setTaskPage] = useState(1);
+
   // ---------------- TASK STATE ----------------
   const [taskForm, setTaskForm] = useState({
     title: "",
@@ -253,6 +258,16 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
       return 0;
   }
 });
+
+const paginatedProjects = projects.slice(
+  (projectPage - 1) * ITEMS_PER_PAGE,
+  projectPage * ITEMS_PER_PAGE
+);
+
+const paginatedTasks = sortedTasks.slice(
+  (taskPage - 1) * ITEMS_PER_PAGE,
+  taskPage * ITEMS_PER_PAGE
+);
 
   return (
     <div className="dashboard-page">
@@ -486,7 +501,7 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
             <p>No projects found.</p>
           ) : (
             <div className="project-list">
-              {projects.map((project) => (
+              {paginatedProjects.map((project) => (
                 <div key={project.id} className="project-card">
                   <h3>{project.title}</h3>
                   <p>{project.description}</p>
@@ -523,6 +538,30 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
             </div>
           )}
         </div>
+
+        <div className="pagination">
+  <button
+    disabled={projectPage === 1}
+    onClick={() => setProjectPage(projectPage - 1)}
+  >
+    Previous
+  </button>
+
+  <span>
+    Page {projectPage} of{" "}
+    {Math.ceil(projects.length / ITEMS_PER_PAGE)}
+  </span>
+
+  <button
+    disabled={
+      projectPage >=
+      Math.ceil(projects.length / ITEMS_PER_PAGE)
+    }
+    onClick={() => setProjectPage(projectPage + 1)}
+  >
+    Next
+  </button>
+</div>
 
         <div className="dashboard-section">
   <h2>Search & Filter Tasks</h2>
@@ -563,11 +602,11 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
         {/* TASK LIST */}
         <div className="dashboard-section">
           <h2>All Tasks</h2>
-          {sortedTasks.length === 0 ? (
+          {paginatedTasks.length === 0 ? (
             <p>No tasks found.</p>
           ) : (
             <div className="task-list">
-              {sortedTasks.map((task) => (
+              {paginatedTasks.map((task) => (
                 <div key={task.id} className="task-card">
                   <h3>{task.title}</h3>
                   <p>{task.description}</p>
@@ -594,6 +633,30 @@ const sortedTasks = [...filteredTasks].sort((a, b) => {
             </div>
           )}
         </div>
+
+<div className="pagination">
+  <button
+    onClick={() => setTaskPage(taskPage - 1)}
+    disabled={taskPage === 1}
+  >
+    Previous
+  </button>
+
+  <span>
+    Page {taskPage} of {Math.ceil(sortedTasks.length / ITEMS_PER_PAGE)}
+  </span>
+
+  <button
+    onClick={() => setTaskPage(taskPage + 1)}
+    disabled={
+      taskPage ===
+      Math.ceil(sortedTasks.length / ITEMS_PER_PAGE)
+    }
+  >
+    Next
+  </button>
+</div>
+
       </div>
     </div>
   );
