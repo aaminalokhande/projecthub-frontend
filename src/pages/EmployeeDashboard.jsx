@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getTasks } from "../services/api";
 import { updateTaskStatus } from "../services/api";
+import TaskStatusChart from "../components/charts/TaskStatusChart";
 
 function EmployeeDashboard() {
   const { user, token, logout } = useAuth();
@@ -27,6 +28,17 @@ const [taskPage, setTaskPage] = useState(1);
   } finally {
     setLoadingTasks(false);
   }
+};
+
+const refreshDashboard = () => {
+  fetchTasks();
+};
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
 };
 
   const handleStatusUpdate = async (taskId) => {
@@ -141,6 +153,125 @@ const handleLogout = () => {
   Logout
 </button>
         </div>
+
+        <div className="dashboard-section">
+  <h2>Analytics</h2>
+
+  <div className="charts-grid">
+    <TaskStatusChart tasks={tasks} />
+  </div>
+</div>
+
+<div className="dashboard-section">
+  <h2>Quick Actions</h2>
+
+  <div className="quick-actions">
+    <button onClick={refreshDashboard}>
+      🔄 Refresh Tasks
+    </button>
+
+    <button onClick={scrollToTop}>
+      ⬆ Scroll to Top
+    </button>
+  </div>
+</div>
+
+<div className="dashboard-section">
+  <h2>My Recent Tasks</h2>
+
+  {tasks.length === 0 ? (
+    <p>No tasks assigned.</p>
+  ) : (
+    <div className="task-list">
+      {[...tasks]
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 5)
+        .map((task) => (
+          <div key={task.id} className="task-card">
+            <h3>{task.title}</h3>
+
+            <p>{task.description}</p>
+
+            <p>
+              <strong>Status:</strong> {task.status}
+            </p>
+
+            <p>
+              <strong>Priority:</strong> {task.priority}
+            </p>
+
+            <p>
+              <strong>Due:</strong> {task.due_date}
+            </p>
+          </div>
+        ))}
+    </div>
+  )}
+</div>
+
+<div className="dashboard-section">
+  <h2>Recently Completed Tasks</h2>
+
+  {tasks.filter((t) => t.status === "completed").length === 0 ? (
+    <p>No completed tasks yet.</p>
+  ) : (
+    <div className="task-list">
+      {tasks
+        .filter((task) => task.status === "completed")
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 5)
+        .map((task) => (
+          <div key={task.id} className="task-card">
+            <h3>{task.title}</h3>
+
+            <p>{task.description}</p>
+
+            <p>
+              <strong>Status:</strong> {task.status}
+            </p>
+
+            <p>
+              <strong>Priority:</strong> {task.priority}
+            </p>
+
+            <p>
+              <strong>Due:</strong> {task.due_date}
+            </p>
+          </div>
+        ))}
+    </div>
+  )}
+</div>
+
+<div className="dashboard-section">
+  <h2>Pending Tasks</h2>
+
+  {tasks.filter((t) => t.status === "pending").length === 0 ? (
+    <p>No pending tasks.</p>
+  ) : (
+    <div className="task-list">
+      {tasks
+        .filter((task) => task.status === "pending")
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 5)
+        .map((task) => (
+          <div key={task.id} className="task-card">
+            <h3>{task.title}</h3>
+
+            <p>{task.description}</p>
+
+            <p>
+              <strong>Priority:</strong> {task.priority}
+            </p>
+
+            <p>
+              <strong>Due:</strong> {task.due_date}
+            </p>
+          </div>
+        ))}
+    </div>
+  )}
+</div>
 
         <div className="dashboard-section">
   <h2>Search & Filter Tasks</h2>

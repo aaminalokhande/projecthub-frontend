@@ -488,3 +488,27 @@ body {
 .activity-card p {
   margin: 4px 0;
 }
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.quick-actions button {
+  flex: 1;
+  min-width: 180px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.quick-actions button:hover {
+  background: #1d4ed8;
+}

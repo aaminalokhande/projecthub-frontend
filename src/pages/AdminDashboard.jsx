@@ -86,6 +86,36 @@ const [taskPage, setTaskPage] = useState(1);
   }
 };
 
+const refreshDashboard = () => {
+  fetchProjects();
+  fetchTasks();
+};
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
+const scrollToCreateProject = () => {
+  const section = document.getElementById("create-project-section");
+  if (section) {
+    section.scrollIntoView({
+      behavior: "smooth",
+    });
+  }
+};
+
+const scrollToCreateTask = () => {
+  const section = document.getElementById("create-task-section");
+  if (section) {
+    section.scrollIntoView({
+      behavior: "smooth",
+    });
+  }
+};
+
   useEffect(() => {
     if (token) {
       fetchProjects();
@@ -366,6 +396,28 @@ const handleLogout = () => {
 </div>
 
 <div className="dashboard-section">
+  <h2>Quick Actions</h2>
+
+  <div className="quick-actions">
+    <button onClick={scrollToCreateProject}>
+      ➕ Create Project
+    </button>
+
+    <button onClick={scrollToCreateTask}>
+      📋 Create Task
+    </button>
+
+    <button onClick={refreshDashboard}>
+      🔄 Refresh Dashboard
+    </button>
+
+    <button onClick={scrollToTop}>
+      ⬆ Scroll to Top
+    </button>
+  </div>
+</div>
+
+<div className="dashboard-section">
   <h2>Recent Projects</h2>
 
   <div className="project-list">
@@ -469,8 +521,10 @@ const handleLogout = () => {
         </div>
 
         {/* CREATE PROJECT */}
-        <div className="dashboard-section">
-          <h2>Create Project</h2>
+        <div
+  id="create-project-section"
+  className="dashboard-section">
+  <h2>Create Project</h2>
           <form onSubmit={handleProjectSubmit} className="dashboard-form">
             <input
               type="text"
@@ -573,8 +627,10 @@ const handleLogout = () => {
         </div>
 
         {/* CREATE TASK */}
-        <div className="dashboard-section">
-          <h2>Create Task</h2>
+        <div
+  id="create-task-section"
+  className="dashboard-section">
+  <h2>Create Task</h2>
           <form onSubmit={handleTaskSubmit} className="dashboard-form">
             <input
               type="text"

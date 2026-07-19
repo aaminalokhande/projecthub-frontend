@@ -7,6 +7,8 @@ import {
   updateTask,
   deleteTask,
 } from "../services/api";
+import TaskStatusChart from "../components/charts/TaskStatusChart";
+import TaskPriorityChart from "../components/charts/TaskPriorityChart";
 
 function TeamLeadDashboard() {
   const { user, token, logout } = useAuth();
@@ -73,6 +75,27 @@ const emptyTaskForm = {
     console.error(err);
   } finally {
     setLoadingTasks(false);
+  }
+};
+
+const refreshDashboard = () => {
+  fetchProjects();
+  fetchTasks();
+};
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
+const scrollToCreateTask = () => {
+  const section = document.getElementById("create-task-section");
+  if (section) {
+    section.scrollIntoView({
+      behavior: "smooth",
+    });
   }
 };
 
@@ -274,9 +297,134 @@ const handleLogout = () => {
 </button>
         </div>
 
-        {/* CREATE TASK */}
         <div className="dashboard-section">
-          <h2>Create Task</h2>
+  <h2>Analytics</h2>
+
+  <div className="charts-grid">
+    <TaskStatusChart tasks={tasks} />
+    <TaskPriorityChart tasks={tasks} />
+  </div>
+</div>
+
+<div className="dashboard-section">
+  <h2>Quick Actions</h2>
+
+  <div className="quick-actions">
+    <button onClick={scrollToCreateTask}>
+      📋 Create Task
+    </button>
+
+    <button onClick={refreshDashboard}>
+      🔄 Refresh Tasks
+    </button>
+
+    <button onClick={scrollToTop}>
+      ⬆ Scroll to Top
+    </button>
+  </div>
+</div>
+
+<div className="dashboard-section">
+  <h2>Recent Projects</h2>
+
+  {projects.length === 0 ? (
+    <p>No projects assigned.</p>
+  ) : (
+    <div className="project-list">
+      {[...projects]
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 5)
+        .map((project) => (
+          <div key={project.id} className="project-card">
+            <h3>{project.title}</h3>
+
+            <p>{project.description}</p>
+
+            <p>
+              <strong>Status:</strong> {project.status}
+            </p>
+
+            <p>
+              <strong>Due:</strong> {project.due_date}
+            </p>
+          </div>
+        ))}
+    </div>
+  )}
+</div>
+
+<div className="dashboard-section">
+  <h2>Recent Tasks</h2>
+
+  {tasks.length === 0 ? (
+    <p>No tasks found.</p>
+  ) : (
+    <div className="task-list">
+      {[...tasks]
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 5)
+        .map((task) => (
+          <div key={task.id} className="task-card">
+            <h3>{task.title}</h3>
+
+            <p>{task.description}</p>
+
+            <p>
+              <strong>Status:</strong> {task.status}
+            </p>
+
+            <p>
+              <strong>Priority:</strong> {task.priority}
+            </p>
+
+            <p>
+              <strong>Due:</strong> {task.due_date}
+            </p>
+          </div>
+        ))}
+    </div>
+  )}
+</div>
+
+<div className="dashboard-section">
+  <h2>Recently Completed Tasks</h2>
+
+  {tasks.filter((t) => t.status === "completed").length === 0 ? (
+    <p>No completed tasks yet.</p>
+  ) : (
+    <div className="task-list">
+      {tasks
+        .filter((task) => task.status === "completed")
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 5)
+        .map((task) => (
+          <div key={task.id} className="task-card">
+            <h3>{task.title}</h3>
+
+            <p>{task.description}</p>
+
+            <p>
+              <strong>Status:</strong> {task.status}
+            </p>
+
+            <p>
+              <strong>Priority:</strong> {task.priority}
+            </p>
+
+            <p>
+              <strong>Due:</strong> {task.due_date}
+            </p>
+          </div>
+        ))}
+    </div>
+  )}
+</div>
+
+        {/* CREATE TASK */}
+        <div
+  id="create-task-section"
+  className="dashboard-section">
+  <h2>Create Task</h2>
           <form onSubmit={handleTaskSubmit} className="dashboard-form">
             <input
               type="text"
