@@ -121,7 +121,7 @@ if (
   setTaskError("Invalid Employee ID.");
   return;
 }
-    setSubmittinf(true);
+    setSubmitting(true);
 
     try {
       const payload = {
@@ -282,6 +282,7 @@ const handleLogout = () => {
               type="text"
               name="title"
               placeholder="Task title"
+              maxLength={100}
               value={taskForm.title}
               onChange={handleTaskChange}
               required
@@ -290,6 +291,7 @@ const handleLogout = () => {
             <textarea
               name="description"
               placeholder="Task description"
+              maxLength={500}
               value={taskForm.description}
               onChange={handleTaskChange}
               required
@@ -342,13 +344,19 @@ const handleLogout = () => {
 
             <button
   type="submit"
-  disabled={submitting}
+  disabled={
+    submitting ||
+    !taskForm.title.trim() ||
+    !taskForm.description.trim() ||
+    !taskForm.project_id ||
+    !taskForm.due_date
+  }
 >
   {submitting
     ? "Saving..."
     : editingTaskId
-      ? "Update Task"
-      : "Create Task"}
+    ? "Update Task"
+    : "Create Task"}
 </button>
 {editingTaskId && (
   <button

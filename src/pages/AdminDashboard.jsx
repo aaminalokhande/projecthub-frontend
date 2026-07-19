@@ -10,6 +10,9 @@ import {
     updateTask,
     deleteTask,
 } from "../services/api";
+import TaskStatusChart from "../components/charts/TaskStatusChart";
+import TaskPriorityChart from "../components/charts/TaskPriorityChart";
+import ProjectStatusChart from "../components/charts/ProjectStatusChart";
 
 function AdminDashboard() {
   const { user, token, logout } = useAuth();
@@ -352,6 +355,16 @@ const handleLogout = () => {
     </div>
 
   </div>
+<div className="dashboard-section">
+  <h2>Analytics</h2>
+
+  <div className="charts-grid">
+    <TaskStatusChart tasks={tasks} />
+    <TaskPriorityChart tasks={tasks} />
+    <ProjectStatusChart projects={projects}/>
+  </div>
+</div>
+
 </div>
           <div>
             <h1>Admin Dashboard</h1>
@@ -374,6 +387,7 @@ const handleLogout = () => {
             <input
               type="text"
               name="title"
+              maxLength={100}
               placeholder="Project title"
               value={projectForm.title}
               onChange={handleProjectChange}
@@ -383,6 +397,7 @@ const handleLogout = () => {
             <textarea
               name="description"
               placeholder="Project description"
+              maxLength={500}
               value={projectForm.description}
               onChange={handleProjectChange}
               required
@@ -422,9 +437,24 @@ const handleLogout = () => {
               onChange={handleProjectChange}
             />
 
-           <button type="submit">
-  {editingProject ? "Update Project" : "Create Project"}
+           <button
+  type="submit"
+  disabled={
+    submitting ||
+    !projectForm.title.trim() ||
+    !projectForm.description.trim() ||
+    !projectForm.start_date ||
+    !projectForm.due_date
+  }
+>
+  {submitting
+    ? "Saving..."
+    : "editingProject"
+    ? "Update Project"
+    : "Create Project"}
 </button>
+
+
 
            {editingProject && (
     <button
@@ -462,6 +492,7 @@ const handleLogout = () => {
               type="text"
               name="title"
               placeholder="Task title"
+              maxLength={100}
               value={taskForm.title}
               onChange={handleTaskChange}
               required
@@ -470,6 +501,7 @@ const handleLogout = () => {
             <textarea
               name="description"
               placeholder="Task description"
+              maxLength={500}
               value={taskForm.description}
               onChange={handleTaskChange}
               required
@@ -522,13 +554,13 @@ const handleLogout = () => {
 
             <button
   type="submit"
-  disabled={submitting}
+  disabled={!taskForm.title.trim() || submitting}
 >
   {submitting
     ? "Saving..."
     : editingTaskId
-      ? "Update Task"
-      : "Create Task"}
+    ? "Update Task"
+    : "Create Task"}
 </button>
 
 {editingTaskId && (
