@@ -472,3 +472,19 @@ body {
   margin-top: 20px;
   align-items: start;
 }
+
+.activity-card {
+  background: #fff;
+  border-left: 5px solid #3b82f6;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.activity-card h3 {
+  margin-bottom: 8px;
+}
+
+.activity-card p {
+  margin: 4px 0;
+}

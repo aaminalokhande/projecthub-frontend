@@ -365,6 +365,94 @@ const handleLogout = () => {
   </div>
 </div>
 
+<div className="dashboard-section">
+  <h2>Recent Projects</h2>
+
+  <div className="project-list">
+    {[...projects]
+      .sort((a, b) => b.id - a.id)
+      .slice(0, 5)
+      .map((project) => (
+        <div key={project.id} className="project-card">
+          <h3>{project.title}</h3>
+
+          <p>{project.description}</p>
+
+          <p>
+            <strong>Status:</strong> {project.status}
+          </p>
+
+          <p>
+            <strong>Due:</strong> {project.due_date}
+          </p>
+        </div>
+      ))}
+  </div>
+</div>
+
+<div className="dashboard-section">
+  <h2>Recent Tasks</h2>
+
+  <div className="task-list">
+    {[...tasks]
+      .sort((a, b) => b.id - a.id)
+      .slice(0, 5)
+      .map((task) => (
+        <div key={task.id} className="task-card">
+          <h3>{task.title}</h3>
+
+          <p>{task.description}</p>
+
+          <p>
+            <strong>Status:</strong> {task.status}
+          </p>
+
+          <p>
+            <strong>Priority:</strong> {task.priority}
+          </p>
+
+          <p>
+            <strong>Due:</strong> {task.due_date}
+          </p>
+        </div>
+      ))}
+  </div>
+</div>
+
+<div className="dashboard-section">
+  <h2>Recently Completed Tasks</h2>
+
+  {tasks.filter((t) => t.status === "completed").length === 0 ? (
+    <p>No completed tasks yet.</p>
+  ) : (
+    <div className="task-list">
+      {tasks
+        .filter((task) => task.status === "completed")
+        .sort((a, b) => b.id - a.id)
+        .slice(0, 5)
+        .map((task) => (
+          <div key={task.id} className="task-card">
+            <h3>{task.title}</h3>
+
+            <p>{task.description}</p>
+
+            <p>
+              <strong>Status:</strong> {task.status}
+            </p>
+
+            <p>
+              <strong>Priority:</strong> {task.priority}
+            </p>
+
+            <p>
+              <strong>Due:</strong> {task.due_date}
+            </p>
+          </div>
+        ))}
+    </div>
+  )}
+</div>
+
 </div>
           <div>
             <h1>Admin Dashboard</h1>
